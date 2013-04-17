@@ -52,11 +52,11 @@ class Rss extends DataSource {
 	 * read function.
 	 * 
 	 * @access public
-	 * @param object &$model
+	 * @param object Model $model
 	 * @param array $queryData
 	 * @return array
 	 */
-	public function read(&$model, $queryData = array()) {
+	public function read(Model $model, $queryData = array(), $recursive = NULL) {
 		if (isset($model->feedUrl) && !empty($model->feedUrl)) {
 			$this->config['feedUrl'] = $model->feedUrl;
 		}
@@ -208,12 +208,12 @@ class Rss extends DataSource {
 	 * __sortItems function.
 	 * 
 	 * @access public
-	 * @param mixed &$model
+	 * @param mixed Model $model
 	 * @param mixed $items
 	 * @param mixed $order
 	 * @return void
 	 */
-	public function __sortItems(&$model, $items, $order) {
+	public function __sortItems(Model $model, $items, $order) {
 		if ( empty($order) || empty($order[0]) ) {
 			return $items;
 		}
@@ -264,12 +264,12 @@ class Rss extends DataSource {
 	 * calculate function.
 	 * 
 	 * @access public
-	 * @param mixed &$model
+	 * @param mixed Model $model
 	 * @param mixed $func
 	 * @param array $params
 	 * @return void
 	 */
-	public function calculate(&$model, $func, $params = array()) {
+	public function calculate(Model $model, $func, $params = array()) {
 		return '__'.$func;
 	}
 	
@@ -279,7 +279,7 @@ class Rss extends DataSource {
 	 * @access public
 	 * @return void
 	 */
-	public function create() {
+	public function create(Model $model, $fields = NULL, $values = NULL) {
 		return false;
 	}
 	
@@ -289,7 +289,7 @@ class Rss extends DataSource {
 	 * @access public
 	 * @return void
 	 */
-	public function update() {
+	public function update(Model $model, $fields = NULL, $values = NULL, $conditions = NULL) {
 		return false;
 	}
 	
@@ -299,7 +299,7 @@ class Rss extends DataSource {
 	 * @access public
 	 * @return void
 	 */
-	public function delete() {
+	public function delete(Model $model, $id = NULL) {
 		return false;
 	}
 }
