@@ -38,7 +38,7 @@ class Rss extends DataSource {
 		'rss'	=> array(
 			'root'		=> 'rss',
 			'channel'	=> 'channel',
-			'feed'		=> 'item'
+			'item'		=> 'item'
 		),
 		'atom'	=> array(
 			'root'		=> 'feed',
