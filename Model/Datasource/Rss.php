@@ -34,6 +34,18 @@ class Rss extends DataSource {
 		'cacheTime' => '+1 day',
 		'version' => '2.0',
 	);
+	public $format = array(
+		'rss'	=> array(
+			'root'		=> 'rss',
+			'channel'	=> 'channel',
+			'feed'		=> 'item'
+		),
+		'atom'	=> array(
+			'root'		=> 'feed',
+			'channel'	=> false,
+			'item'		=> 'entry',
+		)
+	);
 	
 	public $cacheSources = false;
 		
@@ -61,13 +73,19 @@ class Rss extends DataSource {
 			$this->config['feedUrl'] = $model->feedUrl;
 		}
 		$data = $this->__readData();
-
+		$format = Set::check($data, 'rss') ? 'rss' : 'atom';
 		$channel = Set::extract($data, 'rss.channel');
 		if ( isset($channel['item']) ) {
 			unset($channel['item']);
 		}
+		
+		if ($format == 'rss') {
+			$path = sprintf('%s.%s.%s', $this->format[$format]['root'], $this->format[$format]['channel'], $this->format[$format]['item']);
+		} elseif ($format == 'atom') {
+			$path = sprintf('%s.%s', $this->format[$format]['root'], $this->format[$format]['item']);
+		}
 
-		$items = Set::extract($data, 'rss.channel.item');
+		$items = Set::extract($data, $path);
 
 		if ( $items ) {
 			$items = $this->__filterItems($items, $queryData['conditions']);
@@ -90,7 +108,7 @@ class Rss extends DataSource {
 		$result = array();
 		if (is_array($items)) {
 			foreach($items as $item) {
-				$item['channel'] = $channel;
+				$item[$this->format[$format]['channel']] = $channel;
 				$result[] = array($model->alias => $item);
 			}
 		}
@@ -124,7 +142,7 @@ class Rss extends DataSource {
 		$data = Cache::read($cachePath);
 
 		if ($data === false) {
-			$data = Set::reverse(
+			$data = Set::reverse( 
 				Xml::build(
 					$this->config['feedUrl'],
 					array(
@@ -233,7 +251,7 @@ class Rss extends DataSource {
 			$field = str_replace($model->alias.'.', '', $field);
 
 			$values =  Set::extract($items, '{n}.'.$field);
-			if ( in_array($field, array('lastBuildDate', 'pubDate')) ) {
+			if ( in_array($field, array('lastBuildDate', 'pubDate', 'published', 'updated')) ) {
 				foreach($values as $i => $value) {
 					$values[$i] = strtotime($value);
 				}
