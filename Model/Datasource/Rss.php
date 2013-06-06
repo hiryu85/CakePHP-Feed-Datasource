@@ -142,18 +142,21 @@ class Rss extends DataSource {
 		$data = Cache::read($cachePath);
 
 		if ($data === false) {
-			$data = Set::reverse( 
-				Xml::build(
+			try {
+				$Xml =	Xml::build(
 					$this->config['feedUrl'],
 					array(
 						'version' => $this->config['version'],
 						'encoding' => $this->config['encoding']
 					)
-				)
-			);
+				);
+				$data = Set::reverse($Xml);
+				Cache::set(array('duration' => $cacheTime));
+				Cache::write($cachePath, serialize($data));
+			} catch(Exception $e) { 
+				trigger_error(sprintf('Cannot read this feed: %s', $this->config['feedUrl']));
+			}
 
-			Cache::set(array('duration' => $cacheTime));
-			Cache::write($cachePath, serialize($data));
 		}
 		else {
 			$data = unserialize($data);
